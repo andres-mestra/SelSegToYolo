@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from json import  dump
 
+from get_fast_sam import get_fast_sam_model
 from sam_model import get_sam_model
 from get_images import get_images_paths
 from show_sam_predicts import show_mask, show_points
@@ -22,7 +23,7 @@ points = []
 labels = []
 def onclick(event):
     global points
-    points.append([event.xdata, event.ydata])
+    points.append([int(event.xdata), int(event.ydata)])
     labels.append(1)
 
 counter = 1
@@ -47,25 +48,20 @@ for imagePath in images:
   plt.show()
 
 
-  #SAM prediction
-  SAM.set_image(image)
+  #Fast SAM prediction
   input_point = np.array(points)
   input_label = np.array(labels)
-  masks, scores, logits = SAM.predict(
-    point_coords=input_point,
-    point_labels=input_label,
-    multimask_output=False,
-  )
+  FastSAM = get_fast_sam_model(image_dir)
+  masks = FastSAM.point_prompt(points=points, pointlabel=labels)
 
-  #Show prediction
-  for i, (mask, score) in enumerate(zip(masks, scores)):
-    plt.figure(figsize=(10,10))
-    plt.imshow(image)
-    show_mask(mask, plt.gca())
-    show_points(input_point, input_label, plt.gca())
-    plt.title(f"Mask {i+1}, Score: {score:.3f}, Img: {imagePath}", fontsize=18)
-    plt.axis('off')
-    plt.show()
+
+  plt.figure(figsize=(10,10))
+  plt.imshow(image)
+  show_mask(masks, plt.gca())
+  show_points(input_point, input_label, plt.gca())
+  plt.title(f"Img: {imagePath}", fontsize=18)
+  plt.axis('off')
+  plt.show()
 
   #Coordinates 
   mask_best = masks[0]
