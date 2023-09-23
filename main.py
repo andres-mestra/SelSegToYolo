@@ -6,8 +6,11 @@ import matplotlib.pyplot as plt
 from json import  dump
 
 from get_fast_sam import get_fast_sam_model
+from sam_model import get_sam_model
 from get_images import get_images_paths
 from show_sam_predicts import show_mask, show_points
+
+SAM = get_sam_model()
 
 muestra_dir = 'testeo'
 category_dir_name= 'birds' #Carpeta de las imagenes de la categoria
@@ -25,7 +28,6 @@ def onclick(event):
 
 counter = 1
 for imagePath in images:
-  print(imagePath)
   #Validate image file
   if imagePath.split('.')[-1] != 'jpg':
     print(f"{imagePath} is not a jpg file")
@@ -41,7 +43,7 @@ for imagePath in images:
   #show image
   fig = plt.figure(figsize=(10,10))
   plt.imshow(image)
-  fig.canvas.mpl_connect('button_press_event', onclick)
+  cid = fig.canvas.mpl_connect('button_press_event', onclick)
   plt.axis('off')
   plt.show()
 
@@ -51,6 +53,7 @@ for imagePath in images:
   input_label = np.array(labels)
   FastSAM = get_fast_sam_model(image_dir)
   masks = FastSAM.point_prompt(points=points, pointlabel=labels)
+
 
   plt.figure(figsize=(10,10))
   plt.imshow(image)
