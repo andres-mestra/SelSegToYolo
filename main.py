@@ -19,6 +19,12 @@ category_name = 'bird' #Categoria solo cambiar nombre
 images = get_images_paths(category_dir)
 #images = ['birds_26675.jpg','birds_25876.jpg']
 
+
+def show_mask_empty_error(counter, imagePath): 
+  print(f"{counter}: {imagePath} 🤦‍♂️")
+  
+    
+
 points = []
 labels = []
 def onclick(event):
@@ -26,8 +32,11 @@ def onclick(event):
     points.append([int(event.xdata), int(event.ydata)])
     labels.append(1)
 
-counter = 1
+counter = 0
 for imagePath in images:
+  print(f"{counter}: {imagePath}")
+  counter += 1
+  
   #Validate image file
   if imagePath.split('.')[-1] != 'jpg':
     print(f"{imagePath} is not a jpg file")
@@ -53,7 +62,12 @@ for imagePath in images:
   input_label = np.array(labels)
   FastSAM = get_fast_sam_model(image_dir)
   masks = FastSAM.point_prompt(points=points, pointlabel=labels)
-
+  
+  is_masks_empty = len(masks) == 0
+  if(is_masks_empty):
+    show_mask_empty_error(counter, imagePath)
+    continue
+  
 
   plt.figure(figsize=(10,10))
   plt.imshow(image)
@@ -69,14 +83,9 @@ for imagePath in images:
   coordinate_list = np.array([list([row, column]) for row, column in zip(row, column)]).tolist()
   
   is_mask_empty = len(coordinate_list) == 0
-  if is_mask_empty:
-    print(f"{counter}: {imagePath} 🤦‍♂️")
-  else:
-    print(f"{counter}: {imagePath}")
-    
-  #Counter
-  counter += 1
-  
+  if(is_mask_empty): 
+    show_mask_empty_error(counter, imagePath)
+    continue
 
   #Image to base64
   _, imageBuffer = cv2.imencode('.jpg', image)
