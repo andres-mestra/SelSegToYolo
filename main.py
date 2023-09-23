@@ -5,10 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from json import  dump
 
+from sam_model import get_sam_model
 from get_fast_sam import get_fast_sam_model
 from get_images import get_images_paths
 from show_sam_predicts import show_mask, show_points
 
+#Instancia modelo SAM
+SAM = get_sam_model()
 
 muestra_dir = 'testeo'
 category_dir_name= 'birds' #Carpeta de las imagenes de la categoria
@@ -18,10 +21,16 @@ images = get_images_paths(category_dir)
 #images = ['birds_26675.jpg','birds_25876.jpg']
 
 
-def show_mask_empty_error(counter, imagePath): 
-  print(f"{counter}: {imagePath} 🤦‍♂️")
+def show_mask_empty_error(counter, imagePath, customMessage = ""): 
+  print(f"{counter}: {imagePath} 🤦‍♂️, {customMessage}")
   
-    
+
+def get_coordinates_from_mask(masks):
+  #Coordinates 
+  mask_best = masks[0]
+  row, column = np.where(mask_best)
+  coordinate_list = np.array([list([row, column]) for row, column in zip(row, column)]).tolist()
+  return coordinate_list
 
 points = []
 labels = []
@@ -32,13 +41,15 @@ def onclick(event):
 
 counter = 0
 for imagePath in images:
-  print(f"{counter}: {imagePath}")
-  counter += 1
   
   #Validate image file
   if imagePath.split('.')[-1] != 'jpg':
     print(f"{imagePath} is not a jpg file")
     continue
+  
+  #Counter
+  print(f"{counter}: {imagePath}")
+  counter += 1
 
   #Reset points
   points = []
@@ -51,6 +62,7 @@ for imagePath in images:
   fig = plt.figure(figsize=(20, 20))
   plt.imshow(image)
   cid = fig.canvas.mpl_connect('button_press_event', onclick)
+  plt.title(f"Img: {imagePath}", fontsize=18)
   plt.axis('off')
   plt.show()
 
@@ -60,29 +72,60 @@ for imagePath in images:
   input_label = np.array(labels)
   FastSAM = get_fast_sam_model(image_dir)
   masks = FastSAM.point_prompt(points=points, pointlabel=labels)
-  
-  is_masks_empty = len(masks) == 0
-  if(is_masks_empty):
-    show_mask_empty_error(counter, imagePath)
-    continue
-  
 
-  plt.figure(figsize=(20, 20))
-  plt.imshow(image)
-  show_mask(masks, plt.gca())
-  show_points(input_point, input_label, plt.gca())
-  plt.title(f"Img: {imagePath}", fontsize=18)
-  plt.axis('off')
-  plt.show()
+  is_masks_empty = len(masks) == 0
+  
+  if(is_masks_empty):
+    coordinate_list = []
+  else: 
+    coordinate_list = get_coordinates_from_mask(masks)
 
   #Coordinates 
-  mask_best = masks[0]
-  row, column = np.where(mask_best)
-  coordinate_list = np.array([list([row, column]) for row, column in zip(row, column)]).tolist()
+  is_coordinates_empty = len(coordinate_list) == 0
+
+  if(is_coordinates_empty):
+    show_mask_empty_error(counter, imagePath, "Fast SAM prediction is empty")
+    
+    print("!Utilizando SAM!")
+    SAM.set_image(image)
+    masks, scores, logits = SAM.predict(
+      point_coords=input_point,
+      point_labels=input_label,
+      multimask_output=False,
+    )
+
+
+    is_masks_empty = len(masks) == 0
+    if(is_masks_empty):
+      show_mask_empty_error(counter, imagePath, "SAM prediction is empty\n")
+      print("---------------------------------------------------")
+      continue
+
+    coordinate_list = get_coordinates_from_mask(masks)
+
+    #Muestra segmentación SAM
+    plt.figure(figsize=(20, 20))
+    plt.imshow(image)
+    show_mask(masks, plt.gca())
+    show_points(input_point, input_label, plt.gca())
+    plt.title(f"Img: {imagePath}, SAM", fontsize=18)
+    plt.axis('off')
+    plt.show()
+  else: 
+    plt.figure(figsize=(20, 20))
+    plt.imshow(image)
+    show_mask(masks, plt.gca())
+    show_points(input_point, input_label, plt.gca())
+    plt.title(f"Img: {imagePath}", fontsize=18)
+    plt.axis('off')
+    plt.show()
+
   
-  is_mask_empty = len(coordinate_list) == 0
-  if(is_mask_empty): 
-    show_mask_empty_error(counter, imagePath)
+  #Coordinates (if entry in SAM)
+  is_coordinates_empty = len(coordinate_list) == 0
+  if(is_coordinates_empty): 
+    show_mask_empty_error(counter, imagePath, "!!Coordinates is empty!! ATENCION\n")
+    print("---------------------------------------------------")
     continue
 
   #Image to base64
@@ -113,3 +156,5 @@ for imagePath in images:
  
   with open(image_json_dir, "w") as archivo:
     dump(image_info, archivo, indent=2)
+
+  print("---------------------------------------------------")
