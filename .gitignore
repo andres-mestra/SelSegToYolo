@@ -1,0 +1,9 @@
+testeo
+data
+test
+run_v1_seg
+run_v2_detect
+sam_vit_l_0b3195.pth
+__pycache__/*
+*.pth
+*.pt
