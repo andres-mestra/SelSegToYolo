@@ -6,11 +6,9 @@ import matplotlib.pyplot as plt
 from json import  dump
 
 from get_fast_sam import get_fast_sam_model
-from sam_model import get_sam_model
 from get_images import get_images_paths
 from show_sam_predicts import show_mask, show_points
 
-SAM = get_sam_model()
 
 muestra_dir = 'testeo'
 category_dir_name= 'birds' #Carpeta de las imagenes de la categoria
