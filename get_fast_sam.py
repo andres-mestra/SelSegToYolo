@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append("..")
-# from segment_anything import sam_model_registry, SamPredictor
+
 from libraries.FastSAM.fastsam import FastSAM, FastSAMPrompt
 
 model = FastSAM('./FastSAM-x.pt')
