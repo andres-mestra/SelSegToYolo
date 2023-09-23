@@ -50,7 +50,7 @@ for imagePath in images:
   image = cv2.imread(image_dir)
   image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
   #show image
-  fig = plt.figure(figsize=(10,10))
+  fig = plt.figure(figsize=(20, 20))
   plt.imshow(image)
   cid = fig.canvas.mpl_connect('button_press_event', onclick)
   plt.axis('off')
@@ -69,7 +69,7 @@ for imagePath in images:
     continue
   
 
-  plt.figure(figsize=(10,10))
+  plt.figure(figsize=(20, 20))
   plt.imshow(image)
   show_mask(masks, plt.gca())
   show_points(input_point, input_label, plt.gca())
