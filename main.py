@@ -14,15 +14,15 @@ from show_sam_predicts import show_mask, show_points
 SAM = get_sam_model()
 
 muestra_dir = 'testeo'
-category_dir_name= 'birds' #Carpeta de las imagenes de la categoria
+category_dir_name= 'cat' #Carpeta de las imagenes de la categoria
 category_dir = muestra_dir + '/' + category_dir_name + '/'
-category_name = 'bird' #Categoria solo cambiar nombre
+category_name = 'cat' #Categoria solo cambiar nombre
 images = get_images_paths(category_dir)
 #images = ['birds_26675.jpg','birds_25876.jpg']
 
 
-def show_mask_empty_error(counter, imagePath, customMessage = ""): 
-  print(f"{counter}: {imagePath} 🤦‍♂️, {customMessage}")
+def show_mask_empty_error(counter, image_path, customMessage = ""): 
+  print(f"{counter}: {image_path} 🤦‍♂️, {customMessage}")
   
 
 def get_coordinates_from_mask(masks):
@@ -40,29 +40,36 @@ def onclick(event):
     labels.append(1)
 
 counter = 0
-for imagePath in images:
+for image_path in images:
+  file_name, extension = image_path.split('.')
   
-  #Validate image file
-  if imagePath.split('.')[-1] != 'jpg':
-    print(f"{imagePath} is not a jpg file")
+  # Validate image file and existance of json file
+  if extension != 'jpg':
+    print(f'{image_path} is not a jpg file')
+    print("---------------------------------------------------")
+    continue 
+  
+  if file_name + '.json' in images:
+    print('Image does alredy have its json file')
+    print("---------------------------------------------------")
     continue
-  
+
   #Counter
-  print(f"{counter}: {imagePath}")
+  print(f"{counter}: {image_path}")
   counter += 1
 
   #Reset points
   points = []
   labels = []
   #Load image
-  image_dir = category_dir + imagePath
+  image_dir = category_dir + image_path
   image = cv2.imread(image_dir)
   image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
   #show image
   fig = plt.figure(figsize=(20, 20))
   plt.imshow(image)
   cid = fig.canvas.mpl_connect('button_press_event', onclick)
-  plt.title(f"Img: {imagePath}", fontsize=18)
+  plt.title(f"Img: {image_path}", fontsize=18)
   plt.axis('off')
   plt.show()
 
@@ -84,7 +91,7 @@ for imagePath in images:
   is_coordinates_empty = len(coordinate_list) == 0
 
   if(is_coordinates_empty):
-    show_mask_empty_error(counter, imagePath, "Fast SAM prediction is empty")
+    show_mask_empty_error(counter, image_path, "Fast SAM prediction is empty")
     
     print("!Utilizando SAM!")
     SAM.set_image(image)
@@ -97,7 +104,7 @@ for imagePath in images:
 
     is_masks_empty = len(masks) == 0
     if(is_masks_empty):
-      show_mask_empty_error(counter, imagePath, "SAM prediction is empty\n")
+      show_mask_empty_error(counter, image_path, "SAM prediction is empty\n")
       print("---------------------------------------------------")
       continue
 
@@ -108,7 +115,7 @@ for imagePath in images:
     plt.imshow(image)
     show_mask(masks, plt.gca())
     show_points(input_point, input_label, plt.gca())
-    plt.title(f"Img: {imagePath}, SAM", fontsize=18)
+    plt.title(f"Img: {image_path}, SAM", fontsize=18)
     plt.axis('off')
     plt.show()
   else: 
@@ -116,7 +123,7 @@ for imagePath in images:
     plt.imshow(image)
     show_mask(masks, plt.gca())
     show_points(input_point, input_label, plt.gca())
-    plt.title(f"Img: {imagePath}", fontsize=18)
+    plt.title(f"Img: {image_path}", fontsize=18)
     plt.axis('off')
     plt.show()
 
@@ -124,7 +131,7 @@ for imagePath in images:
   #Coordinates (if entry in SAM)
   is_coordinates_empty = len(coordinate_list) == 0
   if(is_coordinates_empty): 
-    show_mask_empty_error(counter, imagePath, "!!Coordinates is empty!! ATENCION\n")
+    show_mask_empty_error(counter, image_path, "!!Coordinates is empty!! ATENCION\n")
     print("---------------------------------------------------")
     continue
 
@@ -148,12 +155,12 @@ for imagePath in images:
     ],
     "lineColor": [ 0, 255, 0,128],
     "fillColor": [255,0,0,128],
-    "imagePath": imagePath,
+    "image_path": image_path,
     "imageData": image_encoded
   }
 
   image_json_dir = image_dir.replace(".jpg", ".json")
- 
+
   with open(image_json_dir, "w") as archivo:
     dump(image_info, archivo, indent=2)
 
