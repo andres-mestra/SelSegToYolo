@@ -7,3 +7,4 @@ sam_vit_l_0b3195.pth
 __pycache__/*
 *.pth
 *.pt
+libraries/*
