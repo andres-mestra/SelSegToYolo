@@ -136,6 +136,7 @@ for image_path in images:
     continue
 
   #Image to base64
+  image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
   _, imageBuffer = cv2.imencode('.jpg', image)
   image_encoded = base64.b64encode(imageBuffer).decode('utf-8')
 
