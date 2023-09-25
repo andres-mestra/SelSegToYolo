@@ -1,7 +1,9 @@
-# SAM MODELS
+# SegSegToYolo
+
+## SAM MODELS
 
 https://github.com/facebookresearch/segment-anything#model-checkpoints
 
-# FastSAM
+## FastSAM
 
 https://github.com/CASIA-IVA-Lab/FastSAM
