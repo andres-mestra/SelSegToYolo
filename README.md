@@ -2,7 +2,7 @@
 
 [[`Paper`](https://github.com/andres-mestra/SelSegToYolo/blob/main/paper/integracion_de_modelos_de_IA_DiveAI.pdf)]
 
-SelSegToYolo es una herramienta que te ayuda con el entrenamiento de un modelo de inteligencia artificial para la clasificación, detección y/o segmentación de imágenes. Usando el poder de segmentación de [Segment Anything](https://segment-anything.com/),la detección y clasificación de [Yolov8](https://yolov8.com/), con este método de entrenamiento, eliminas el "ruido" de las imágenes para que el modelo se centre solo en el objeto de interés, lo que hace que su aprendizaje sea mucho más óptimo.
+SelSegToYolo es una herramienta que te ayuda con el entrenamiento de un modelo de inteligencia artificial para la clasificación, detección y/o segmentación de imágenes. Usando el poder de segmentación de [Segment Anything](https://segment-anything.com/),la detección y clasificación de [Yolov8](https://yolov8.com/), con este método de entrenamiento, eliminas el "ruido" de las imágenes para que el modelo se centre solo en el objeto de interés, lo que hace que su aprendizaje sea óptimo.
 
 ## Instalaciones requeridas
 
