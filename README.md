@@ -9,7 +9,7 @@ SelSegToYolo es una herramienta que te ayuda con el entrenamiento de un modelo d
 - [Yolov8](https://github.com/ultralytics/ultralytics)
 - [FastSam](https://github.com/CASIA-IVA-Lab/FastSAM)
 
-Adiconalmente instalar los cli:
+Adicionalmente instalar los cli:
 
 - [labelme2yolo](https://pypi.org/project/labelme2yolo/)
   ```shell
